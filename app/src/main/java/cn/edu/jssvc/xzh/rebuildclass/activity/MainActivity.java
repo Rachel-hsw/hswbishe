@@ -1,13 +1,11 @@
 package cn.edu.jssvc.xzh.rebuildclass.activity;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,9 +19,7 @@ import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTabHost;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -45,13 +41,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
-import java.util.List;
 
 import cn.edu.jssvc.xzh.rebuildclass.R;
 import cn.edu.jssvc.xzh.rebuildclass.fragment.ExerciseFragment;
 import cn.edu.jssvc.xzh.rebuildclass.fragment.ForumFragment;
 import cn.edu.jssvc.xzh.rebuildclass.fragment.ProjectFragment;
-import cn.edu.jssvc.xzh.rebuildclass.myinterface.PermissionListener;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;

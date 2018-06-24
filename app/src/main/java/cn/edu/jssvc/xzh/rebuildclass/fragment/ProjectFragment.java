@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,41 +60,35 @@ public class ProjectFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-    /*    if (rootView == null) {
-            rootView = inflater.inflate(R.layout.fragment_project, container, false);
+        if (rootView == null) {
             //假如有网络操作建议放在这里面，避免重复加载
-            memoryCacheUtils =new MemoryCacheUtils();
-            if (memoryCacheUtils != null) {
-                String responseData=memoryCacheUtils.getJsonLruCache(1);
-                if (responseData != null&&!responseData.equals("")) {
-                    LogUtil.e("list取出=="+responseData);
-                    parseJSON(responseData);
-                }else{
-                    if (isNetworkAvalible(getActivity())){
-                        sendRequestWithOkHttp();
-                    }
-                }
-            }
-        }else{
             rootView = inflater.inflate(R.layout.fragment_project, container, false);
+            memoryCacheUtils =new MemoryCacheUtils();
+            if (isNetworkAvalible(getActivity())){
+                sendRequestWithOkHttp();
+            }
+        } else {
+            if (memoryCacheUtils != null) {
             String responseData=memoryCacheUtils.getJsonLruCache(1);
             if (responseData != null&&!responseData.equals("")) {
                 LogUtil.e("list取出=="+responseData);
+                projList.clear();
                 parseJSON(responseData);
                 adapter.notifyDataSetChanged();
+
             }
-        }
-// 缓存的rootView需要判断是否已经被加过parent，如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
-        ViewGroup parent=(ViewGroup) rootView.getParent();
-        if(parent!=null){
-            parent.removeView(rootView);
-        }
-
-        return rootView;*/
-        return inflater.inflate(R.layout.fragment_project, container, false);
-
+            }else{
+                if (isNetworkAvalible(getActivity())){
+                    sendRequestWithOkHttp();
+                }
+            }
+            //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
+            ViewGroup parent = (ViewGroup) rootView.getParent();
+            if (parent != null) {
+                parent.removeView(rootView);
+            }}
+            return rootView;
     }
-
     /**
      * 相当于Activity的onCreate()方法加载控件和操作
      */
@@ -102,9 +97,7 @@ public class ProjectFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         initView();
         handleMessage();
-        sendRequestWithOkHttp();
-
-
+        Log.i("hswtest2","hswtest");
     }
 
     @Override
@@ -185,11 +178,11 @@ public class ProjectFragment extends Fragment {
      * 初始化布局
      */
     private void initView() {
-        projList.clear();
          recyclerView = (RecyclerView) getView().findViewById(R.id.recycler_view);
         // 设置两列布局
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerView.setLayoutManager(layoutManager);
+        Log.i("hswtest3","hswtest");
         adapter = new ProjAdapter(getActivity(),projList,handler);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
