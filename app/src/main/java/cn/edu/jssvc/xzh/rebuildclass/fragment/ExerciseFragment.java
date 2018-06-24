@@ -1,6 +1,7 @@
 package cn.edu.jssvc.xzh.rebuildclass.fragment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import org.json.JSONArray;
@@ -25,6 +27,9 @@ import cn.edu.jssvc.xzh.rebuildclass.R;
 import cn.edu.jssvc.xzh.rebuildclass.adapter.GridViewAdapter;
 import cn.edu.jssvc.xzh.rebuildclass.adapter.ViewPager2Adapter;
 import cn.edu.jssvc.xzh.rebuildclass.pojo.General;
+import cn.edu.jssvc.xzh.rebuildclass.util.LogUtil;
+import cn.edu.jssvc.xzh.rebuildclass.util.MemoryCacheUtils;
+import cn.edu.jssvc.xzh.rebuildclass.util.NetCacheUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -53,11 +58,44 @@ public class ExerciseFragment extends Fragment {
     private Thread mThread;
     private Handler mHandler;
     private String IP = webAddress+ "";
-
+    private View rootView;//缓存Fragment view
+    private MemoryCacheUtils memoryCacheUtils ;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_exercise, container, false);
+        if (rootView == null) {
+            //假如有网络操作建议放在这里面，避免重复加载
+            rootView = inflater.inflate(R.layout.fragment_project, container, false);
+            memoryCacheUtils =new MemoryCacheUtils();
+            if (isNetworkAvalible(getActivity())){
+                setRequest();
+                mThread.start();
+            }
+        } else {
+            if (memoryCacheUtils != null) {
+                 mResponseData=memoryCacheUtils.getJsonLruCache(2);
+                if (mResponseData != null&&!mResponseData.equals("")) {
+                    LogUtil.e("list取出=="+mResponseData);
+                    mGridList.clear();
+                    try {
+                        parseJSON();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    mGridViewAdapter.notifyDataSetChanged();
+
+                }
+            }else{
+                if (isNetworkAvalible(getActivity())){
+                    mThread.start();
+                }
+            }
+            //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
+            ViewGroup parent = (ViewGroup) rootView.getParent();
+            if (parent != null) {
+                parent.removeView(rootView);
+            }}
+        return rootView;
     }
 
     /**
@@ -66,16 +104,13 @@ public class ExerciseFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (isNetworkAvalible(getActivity())){
-            setRequest();
+
             handleMessage();
             initView();
 //        initDate();
 //        initPoint();
             setViewPager();
-            mThread.start();
-        }
-
+          /*  mThread.start();*/
 
     }
 
@@ -111,6 +146,8 @@ public class ExerciseFragment extends Fragment {
                             .build();
                     Response response = client.newCall(request).execute();
                     mResponseData = response.body().string();
+                    memoryCacheUtils.addJsonLruCache(2,mResponseData);
+                    LogUtil.e("list放入=="+mResponseData);
                     parseJSON();
                     mHandler.sendEmptyMessage(UPDATE);
                 } catch (Exception e) {
@@ -160,11 +197,33 @@ public class ExerciseFragment extends Fragment {
 //        viewPager.setAdapter(mAdapter);
 //        viewPager.addOnPageChangeListener(this);
 //        viewPager.setCurrentItem(0);
-
-        mGridList.clear();
-        mGridViewAdapter = new GridViewAdapter(getActivity(), mGridList);
+        mGridViewAdapter = new GridViewAdapter(getActivity(), mGridList,handler);
         gridView.setAdapter(mGridViewAdapter);
     }
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case NetCacheUtils.SUCESS://图片请求成功
+                    int position = msg.arg1;
+                    Bitmap bitmap = (Bitmap) msg.obj;
+                    ImageView projImage = (ImageView) gridView.findViewWithTag(position);
+                    if(projImage != null && bitmap!= null){
+                        projImage.setImageBitmap(bitmap);
+                    }
+
+
+                    LogUtil.e("请求图片成功=="+position);
+
+                    break;
+                case NetCacheUtils.FAIL://图片请求失败
+                    position = msg.arg1;
+                    LogUtil.e("请求图片失败=="+position);
+                    break;
+            }
+        }
+    };
 
     /**
      * 初始化数据

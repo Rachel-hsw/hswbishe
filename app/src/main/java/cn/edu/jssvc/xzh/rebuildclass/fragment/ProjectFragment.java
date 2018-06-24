@@ -139,8 +139,6 @@ public class ProjectFragment extends Fragment {
                     String responseData = response.body().string();
                     memoryCacheUtils.addJsonLruCache(1,responseData);
                     LogUtil.e("list放入=="+responseData);
-                    String ww=memoryCacheUtils.getJsonLruCache(1);
-                    LogUtil.e("list取出=="+ww);
                     parseJSON(responseData);
                     mHandler.sendEmptyMessage(UPDATE);
                 } catch (Exception e) {

@@ -68,9 +68,6 @@ public class ProjAdapter extends RecyclerView.Adapter<ProjAdapter.ViewHolder> {
         bitmapCacheUtils = new BitmapCacheUtils(handler);
 
     }
-public  void setmProjList(List<General> projList){
-        this.mProjList=projList;
-}
     /**
      *  创建ViewHolder实例，加载proj_item布局
      *      将加载的布局传入到构造函数中，返回ViewHolder实例

@@ -2,6 +2,8 @@ package cn.edu.jssvc.xzh.rebuildclass.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import java.util.List;
 import cn.edu.jssvc.xzh.rebuildclass.R;
 import cn.edu.jssvc.xzh.rebuildclass.activity.ExerciseContentActivity;
 import cn.edu.jssvc.xzh.rebuildclass.pojo.General;
+import cn.edu.jssvc.xzh.rebuildclass.util.BitmapCacheUtils;
 
 /**
  * Created by xzh on 2017/3/14.
@@ -27,11 +30,14 @@ public class GridViewAdapter extends ArrayAdapter {
 
     private Context mContext;
     private List<General> mList;
-
-    public GridViewAdapter(Context context, List<General> mList) {
+    private  Handler handler;
+    private BitmapCacheUtils bitmapCacheUtils;
+    public GridViewAdapter(Context context, List<General> mList,Handler handler) {
         super(context, 0, mList);
         this.mContext = context;
         this.mList = mList;
+        this.handler = handler;
+        bitmapCacheUtils = new BitmapCacheUtils(handler);
     }
 
     @Override
@@ -59,7 +65,12 @@ public class GridViewAdapter extends ArrayAdapter {
         }
         if (general != null) {
             viewHolder.gridText.setText(general.getName());
-            Glide.with(mContext).load(general.getImageId()).into(viewHolder.gridImage);
+           /* Glide.with(mContext).load(general.getImageId()).into(viewHolder.gridImage);*/
+            Bitmap bitmap = bitmapCacheUtils.getBitmap(general.getImageId(),position);//内存或者本地
+            if(bitmap != null){
+                viewHolder.gridImage.setImageBitmap(bitmap);
+            }
+            viewHolder.gridImage.setTag(R.id.imageloader_uri,position);
         }
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
