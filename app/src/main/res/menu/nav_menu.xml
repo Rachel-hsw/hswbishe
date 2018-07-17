@@ -20,6 +20,10 @@
             android:id="@+id/nav_myforum"
             android:icon="@mipmap/myforum"
             android:title="与我相关"/>
+        <item
+            android:id="@+id/nav_mypraxis"
+            android:icon="@mipmap/myforum"
+            android:title="我的习题"/>
 
         <item
             android:id="@+id/nav_set"

@@ -1,13 +1,20 @@
 package cn.edu.jssvc.xzh.rebuildclass.activity;
 
+import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.RequiresApi;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +26,7 @@ import java.io.IOException;
 
 import cn.edu.jssvc.xzh.rebuildclass.R;
 import cn.edu.jssvc.xzh.rebuildclass.pojo.Exercise;
+import cn.edu.jssvc.xzh.rebuildclass.util.CenterAlignImageSpan;
 import cn.edu.jssvc.xzh.rebuildclass.util.HttpUtil;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -62,6 +70,7 @@ public class ExerciseContentActivity extends BaseActivity {
     private Handler mHandler;
     private RadioButton radioButton;
     private TextView currProg;
+    private RelativeLayout rl_shoucang;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +88,7 @@ public class ExerciseContentActivity extends BaseActivity {
      */
     private void handleMessage() {
         mHandler = new Handler(new Handler.Callback() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean handleMessage(Message message) {
                 switch (message.what) {
@@ -102,8 +112,26 @@ public class ExerciseContentActivity extends BaseActivity {
     /**
      * 添加数据到控件中
      */
+
     private void setData() {
-        question.setText(exercise.getQuestion());
+        SpannableString sp = new SpannableString(exercise.getQuestion());
+
+        //获取一张图片
+        Drawable drawable = getResources().getDrawable(R.mipmap.generic_single_option_icon);
+        drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+
+        //居中对齐imageSpan
+        CenterAlignImageSpan imageSpan = new CenterAlignImageSpan(drawable);
+        sp.setSpan(imageSpan, 0, 1, ImageSpan.ALIGN_BASELINE);
+
+    /*    //普通imageSpan 做对比
+        ImageSpan imageSpan2 = new ImageSpan(drawable);
+        sp.setSpan(imageSpan2, 3, 4, ImageSpan.ALIGN_BASELINE);
+
+        tv.setText(sp);*/
+
+
+        question.setText(sp);
         Achoose.setText(exercise.getAchoose());
         Bchoose.setText(exercise.getBchoose());
         Cchoose.setText(exercise.getCchoose());
@@ -143,6 +171,7 @@ public class ExerciseContentActivity extends BaseActivity {
             public void onClick(View view) {
                 if (count < 30) {
                     next.setText("下一题");
+                    rl_shoucang.setVisibility(View.VISIBLE);
                     next.setClickable(false);
                     // 清空选中数据,这两句顺序不能调换
                     radioGroup.clearCheck();
@@ -158,7 +187,7 @@ public class ExerciseContentActivity extends BaseActivity {
                     mThread.start();
                     // 设置当前进度
                     count++;
-                  /*  currProg.setText(count + "");*/
+                    currProg.setText(count + "");
                 } else {
                     showDialog2(getResources().getString(R.string.isfinal));
                     next.setText("已完成");
@@ -224,6 +253,7 @@ public class ExerciseContentActivity extends BaseActivity {
     /**
      * 初始化控件
      */
+    @SuppressLint("WrongViewCast")
     private void initView() {
         question = (TextView) findViewById(R.id.question);      // 问题
         Achoose = (RadioButton) findViewById(R.id.Achoose);     // 选项A
@@ -233,11 +263,13 @@ public class ExerciseContentActivity extends BaseActivity {
         et_fill = (EditText) findViewById(R.id.et_fill);        // 填空
         btn_q = (Button) findViewById(R.id.btn_q);              //  检查
         next = (Button) findViewById(R.id.next);                //  下一题
-       /* currProg = (TextView) findViewById(R.id.currProg); */     // 当前进度
+        currProg = (TextView) findViewById(R.id.currProg);      // 当前进度
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        rl_shoucang= (RelativeLayout) findViewById(R.id.rl_shoucang);
 
         et_fill.setVisibility(View.INVISIBLE);
         btn_q.setVisibility(View.GONE);
+
     }
 
     /**
