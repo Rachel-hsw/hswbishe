@@ -2,11 +2,15 @@ package cn.edu.jssvc.xzh.rebuildclass.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Handler;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,8 +20,10 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import cn.edu.jssvc.xzh.rebuildclass.R;
+import cn.edu.jssvc.xzh.rebuildclass.activity.BiSheApplication;
 import cn.edu.jssvc.xzh.rebuildclass.activity.ForumContentActivity;
 import cn.edu.jssvc.xzh.rebuildclass.pojo.Forum;
+import cn.edu.jssvc.xzh.rebuildclass.util.BitmapCacheUtils;
 
 
 /**
@@ -30,7 +36,11 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
 
     private Context mContext;
     private List<Forum> mForumList;
-
+    private  Handler handler;
+    /***
+     * 图片三级缓存工具类：
+     */
+    private BitmapCacheUtils bitmapCacheUtils;
     /**
      *  定义一个内部类ViewHolder继承自RecyclerView.ViewHolder
      *      构造函数传递最外层布局，然后通过findViewById()获取布局中的控件实例
@@ -62,8 +72,10 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
      *  将数据源传进来，并赋值给全局变量
      * @param forumList-数据源
      */
-    public ForumAdapter(List<Forum> forumList) {
+    public ForumAdapter(List<Forum> forumList,Handler handler) {
         mForumList = forumList;
+        this.handler = handler;
+        bitmapCacheUtils = new BitmapCacheUtils(handler);
     }
 
     @Override
@@ -111,10 +123,23 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
         }else {
             holder.picture.setVisibility(View.VISIBLE);
             ImageView imageView = new ImageView(mContext);
-            Glide.with(mContext).load(forum.getF_img()).into(imageView);
-            imageView.setMaxHeight(300);
-            imageView.setMaxWidth(300);
+          /*  Glide.with(mContext).load(forum.getF_img()).into(imageView);*/
+            //2.使用自定义的三级缓存请求图片
+
+            Bitmap bitmap = bitmapCacheUtils.getBitmap(forum.getF_img(),position);//内存或者本地
+            if(bitmap != null){
+                imageView.setImageBitmap(bitmap);
+            }
+            WindowManager wm = (WindowManager) BiSheApplication.get().getSystemService(Context.WINDOW_SERVICE);
+            DisplayMetrics dm = new DisplayMetrics();
+            wm.getDefaultDisplay().getMetrics(dm);
+            int width = dm.widthPixels;         // 屏幕宽度（像素）
+            int height = dm.heightPixels;       // 屏幕高度（像素）
+            imageView.setAdjustViewBounds(true);
+            imageView.setMaxHeight(height);
+            imageView.setMaxWidth(width);
             holder.picture.addView(imageView);
+            holder.picture.setTag(R.id.imageloader_uri,position);
         }
     }
     public void addNewData(Forum DiscussList){

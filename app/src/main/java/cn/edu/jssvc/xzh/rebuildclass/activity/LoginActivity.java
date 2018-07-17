@@ -27,6 +27,7 @@ import cn.edu.jssvc.xzh.rebuildclass.R;
 import cn.edu.jssvc.xzh.rebuildclass.myinterface.PermissionListener;
 import cn.edu.jssvc.xzh.rebuildclass.pojo.General;
 import cn.edu.jssvc.xzh.rebuildclass.util.HttpUtil;
+import cn.edu.jssvc.xzh.rebuildclass.util.SpUtils;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -88,7 +89,7 @@ public class LoginActivity extends BaseActivity {
                     String responseData = msg.obj.toString();
                     parseJSON(responseData);
                     savedUsers();
-
+                    SpUtils.get().put("isLogined",true);
                     Intent MainIntent = new Intent(context, MainActivity.class);
                     startActivity(MainIntent);
                     dialog.dismiss();

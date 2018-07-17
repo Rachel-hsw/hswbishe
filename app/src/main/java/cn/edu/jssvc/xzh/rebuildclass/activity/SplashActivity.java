@@ -6,8 +6,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import cn.edu.jssvc.xzh.rebuildclass.R;
+import cn.edu.jssvc.xzh.rebuildclass.util.SpUtils;
 
 /**
  * Created by xzh on 2017/1/16.
@@ -55,9 +58,17 @@ public class SplashActivity extends BaseActivity {
             public boolean handleMessage(Message msg) {
                 if (msg.what == ENTER_HOME) {
                     // 进入主页面
-                    Intent mHomeIntent = new Intent(SplashActivity.this,
-                            LoginActivity.class);
-                    startActivity(mHomeIntent);
+                    if (null== SpUtils.get().get("isLogined")){
+                        SpUtils.get().put("isLogined",false);
+                    }
+                    if((Boolean) SpUtils.get().get("isLogined")){
+                        Intent mHomeIntent = new Intent(SplashActivity.this, MainActivity.class);
+                        startActivity(mHomeIntent);
+                    }else{
+                        Intent mHomeIntent = new Intent(SplashActivity.this, LoginActivity.class);
+                        startActivity(mHomeIntent);
+                    }
+
                 } else {
                     // 将App启动的值设为false
                     SharedPreferences.Editor mEditor = mPrefrence.edit();

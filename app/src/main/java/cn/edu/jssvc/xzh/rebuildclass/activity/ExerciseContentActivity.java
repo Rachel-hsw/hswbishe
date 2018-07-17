@@ -158,7 +158,7 @@ public class ExerciseContentActivity extends BaseActivity {
                     mThread.start();
                     // 设置当前进度
                     count++;
-                    currProg.setText(count + "");
+                  /*  currProg.setText(count + "");*/
                 } else {
                     showDialog2(getResources().getString(R.string.isfinal));
                     next.setText("已完成");
@@ -233,7 +233,7 @@ public class ExerciseContentActivity extends BaseActivity {
         et_fill = (EditText) findViewById(R.id.et_fill);        // 填空
         btn_q = (Button) findViewById(R.id.btn_q);              //  检查
         next = (Button) findViewById(R.id.next);                //  下一题
-        currProg = (TextView) findViewById(R.id.currProg);      // 当前进度
+       /* currProg = (TextView) findViewById(R.id.currProg); */     // 当前进度
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
         et_fill.setVisibility(View.INVISIBLE);

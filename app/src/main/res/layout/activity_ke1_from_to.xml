@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
 
     android:background="#FFFFFF"
-    >
+>
 
     <RelativeLayout
         android:id="@+id/top"
@@ -31,8 +31,8 @@
             <TextView
                 android:id="@+id/datimoshi"
                 android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
                 android:text="答题模式"
                 android:textColor="@color/night"
                 android:textSize="20sp"/>
@@ -49,15 +49,24 @@
                 android:textColor="@color/night"
                 android:textSize="20sp"/>
         </LinearLayout>
-        <TextView
-            android:id="@+id/currProg"
+    <ImageView
+        android:id="@+id/shezhi"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="12dp"
+        android:layout_alignParentRight="true"
+        android:layout_width="wrap_content"
+        android:src="@mipmap/day"
+        android:onClick="shezhi"
+        android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/night"
+            android:visibility="gone"
             android:layout_centerVertical="true"
-            android:layout_marginRight="24dp"
+            android:layout_marginRight="12dp"
             android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
-            android:drawableLeft="@mipmap/day"
-            android:text="  0 "
-            android:textSize="20sp"
+            android:src="@mipmap/night"
+            android:onClick="night"
             android:layout_height="wrap_content" />
     </RelativeLayout>
 
@@ -103,11 +112,9 @@
             <TextView
                 android:id="@+id/question"
                 android:layout_width="match_parent"
-                android:layout_margin="10dp"
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="10dp"
                 android:typeface="sans"
-                android:textColor="#000000"
                 android:text="规则：本练习共30道试题，每道试题都是从题库中随机抽取的，您可以在做完一次之后继续练习。\n本试题纯属练习，您在选择一个答案之后系统就会给出您选的答案是否正确，然后根据您的需要进入下一题。。例题如下："
                 android:textSize="18sp" />
 
@@ -151,10 +158,9 @@
     </ScrollView>
 
     <LinearLayout
-        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/bottom"
+        android:layout_above="@+id/next"
         android:id="@+id/edit_fill"
         android:orientation="horizontal">
 
@@ -164,58 +170,37 @@
             android:id="@+id/et_fill"
             android:layout_weight="1"
             android:textSize="15sp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_q"
+            android:background="@drawable/rect_gray"
+            android:text="检查"/>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/next"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/rect_gray"
+        android:enabled="true"
+        android:text="开始" />
 
     <RelativeLayout
         android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:id="@+id/bottom"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@+id/shoucanglayout"
+        android:layout_width="260dp"
         android:layout_height="40dp">
+
         <LinearLayout
             android:layout_alignParentRight="true"
-            android:layout_width="match_parent"
+            android:layout_width="210dp"
+            android:orientation="horizontal"
             android:layout_height="match_parent">
             <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:layout_height="match_parent" >
-                <ImageView
-
-                    android:layout_marginLeft="35dp"
-                    android:id="@+id/shoucang_bg"
-                    android:layout_centerVertical="true"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@mipmap/shoucang"/>
-                <TextView
-                    android:layout_toRightOf="@+id/shoucang_bg"
-                    android:id="@+id/shoucang"
-                    android:text="收藏"
-                    android:textColor="#000000"
-                    android:layout_centerVertical="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </RelativeLayout>
-            <Button
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:id="@+id/next"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:background="#FFFFFF"
-                android:textColor="#000000"
-                android:text="开始"
-                tools:ignore="DuplicateIds" />
-            <Button
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:id="@+id/btn_q"
-                android:textColor="#000000"
-                android:background="#FFFFFF"
-                android:text="检查"/>
-   <!--         <RelativeLayout
                 android:layout_width="0dp"
                 android:orientation="horizontal"
                 android:layout_weight="1"
@@ -223,8 +208,8 @@
                 <ImageView
                     android:id="@+id/hehe"
                     android:layout_centerVertical="true"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:src="@mipmap/cuowu"/>
                 <TextView
                     android:layout_toRightOf="@+id/hehe"
@@ -252,8 +237,8 @@
 
                 <ImageView
                     android:id="@+id/haha"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:src="@mipmap/zhengque"
                     android:layout_centerVertical="true" />
             </RelativeLayout>
@@ -279,7 +264,42 @@
                     android:layout_centerVertical="true"
                     />
 
-            </RelativeLayout>-->
+            </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/shoucanglayout"
+        android:orientation="horizontal"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <Button
+            android:id="@+id/shoucang"
+            android:layout_marginLeft="15dp"
+            android:drawableLeft="@mipmap/shoucang"
+            android:background="#d4f7ed"
+            android:visibility="visible"
+            android:text="收藏"
+            android:onClick="shoucang"
+            android:textColor="@color/night"
+            android:textSize="12sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/quxiaoshoucang"
+            android:layout_marginLeft="15dp"
+            android:drawableLeft="@mipmap/shoucang_other"
+            android:background="#d4f7ed"
+            android:visibility="gone"
+            android:text="取消收藏"
+            android:onClick="quxiaoshoucang"
+            android:textColor="#f11d52"
+            android:textSize="12sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
 </RelativeLayout>

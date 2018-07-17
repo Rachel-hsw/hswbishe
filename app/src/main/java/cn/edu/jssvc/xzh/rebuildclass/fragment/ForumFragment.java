@@ -2,6 +2,7 @@ package cn.edu.jssvc.xzh.rebuildclass.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,9 +15,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -28,6 +31,9 @@ import cn.edu.jssvc.xzh.rebuildclass.activity.PostForumActivity;
 import cn.edu.jssvc.xzh.rebuildclass.adapter.ForumAdapter;
 import cn.edu.jssvc.xzh.rebuildclass.pojo.Forum;
 import cn.edu.jssvc.xzh.rebuildclass.util.GlideCacheUtil;
+import cn.edu.jssvc.xzh.rebuildclass.util.LogUtil;
+import cn.edu.jssvc.xzh.rebuildclass.util.MemoryCacheUtils;
+import cn.edu.jssvc.xzh.rebuildclass.util.NetCacheUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -62,8 +68,33 @@ public class ForumFragment extends Fragment {
 
     private boolean isLoading = false;
     private ProgressDialog loaddialog;
+    private View rootView;//缓存Fragment view
+    private MemoryCacheUtils memoryCacheUtils ;
+
+    private Handler handler1 = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case NetCacheUtils.SUCESS://图片请求成功
+                    int position = msg.arg1;
+                    Bitmap bitmap = (Bitmap) msg.obj;
+                    ImageView projImage = (ImageView) recyclerView.findViewWithTag(position);
+                    if(projImage != null && bitmap!= null){
+                        projImage.setImageBitmap(bitmap);
+                    }
 
 
+                    LogUtil.e("请求图片成功=="+position);
+
+                    break;
+                case NetCacheUtils.FAIL://图片请求失败
+                    position = msg.arg1;
+                    LogUtil.e("请求图片失败=="+position);
+                    break;
+            }
+        }
+    };
     /**
      * 消息处理
      */
@@ -85,7 +116,37 @@ public class ForumFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_forum, container, false);
+        if (rootView == null) {
+            //假如有网络操作建议放在这里面，避免重复加载
+            rootView = inflater.inflate(R.layout.fragment_forum, container, false);
+            memoryCacheUtils =new MemoryCacheUtils();
+            if (isNetworkAvalible(getActivity())){
+                sendRequestWithOkHttp();
+
+            }
+        } else {
+            if (memoryCacheUtils != null) {
+                String responseData=memoryCacheUtils.getJsonLruCache(3);
+                if (responseData != null&&!responseData.equals("")) {
+                    LogUtil.e("list取出=="+responseData);
+                    hList.clear();
+                    parseJSON(responseData);
+                    initForum();
+
+                    adapter.notifyDataSetChanged();
+
+                }
+            }else{
+                if (isNetworkAvalible(getActivity())){
+                    sendRequestWithOkHttp();
+                }
+            }
+            //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
+            ViewGroup parent = (ViewGroup) rootView.getParent();
+            if (parent != null) {
+                parent.removeView(rootView);
+            }}
+        return rootView;
     }
 
     /**
@@ -95,7 +156,7 @@ public class ForumFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         clearGlide();
-        sendRequestWithOkHttp();
+       /* sendRequestWithOkHttp();*/
         initView();
         setRefresh();
         setFAB();
@@ -153,9 +214,9 @@ public class ForumFragment extends Fragment {
     }
 
     private void sendRequestWithOkHttp() {
-        if (isNetworkAvalible(getActivity())){
+
             new Thread(new MyThread()).start();
-        }
+
 
     }
 
@@ -179,7 +240,7 @@ public class ForumFragment extends Fragment {
                 hList.add(forumList.get(i));
             }
         }
-        adapter = new ForumAdapter(hList);
+        adapter = new ForumAdapter(hList,handler1);
         recyclerView.setAdapter(adapter);
 
     }
@@ -301,6 +362,8 @@ public class ForumFragment extends Fragment {
                 Response response = client.newCall(request).execute();
                 String responseData = response.body().string();
                 Message message = new Message();
+                memoryCacheUtils.addJsonLruCache(3,responseData);
+                LogUtil.e("list放入=="+responseData);
                 message.obj = responseData;
                 message.what = SUCCESS_TEXT;
                 handler.sendMessage(message);

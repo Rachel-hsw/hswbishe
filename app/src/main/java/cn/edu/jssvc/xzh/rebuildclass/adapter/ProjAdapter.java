@@ -32,9 +32,10 @@ import cn.edu.jssvc.xzh.rebuildclass.util.NetCacheUtils;
 
 public class ProjAdapter extends RecyclerView.Adapter<ProjAdapter.ViewHolder> {
 
-    private  Handler handler;
+
     private Context mContext;
     private List<General> mProjList;
+    private  Handler handler;
     /***
      * 图片三级缓存工具类：
      */

@@ -65,7 +65,7 @@ public class ExerciseFragment extends Fragment {
                              Bundle savedInstanceState) {
         if (rootView == null) {
             //假如有网络操作建议放在这里面，避免重复加载
-            rootView = inflater.inflate(R.layout.fragment_project, container, false);
+            rootView = inflater.inflate(R.layout.fragment_exercise, container, false);
             memoryCacheUtils =new MemoryCacheUtils();
             if (isNetworkAvalible(getActivity())){
                 setRequest();
@@ -197,8 +197,13 @@ public class ExerciseFragment extends Fragment {
 //        viewPager.setAdapter(mAdapter);
 //        viewPager.addOnPageChangeListener(this);
 //        viewPager.setCurrentItem(0);
+        try{
+       gridView = (GridView) getView().findViewById(R.id.gridview);
         mGridViewAdapter = new GridViewAdapter(getActivity(), mGridList,handler);
         gridView.setAdapter(mGridViewAdapter);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
     private Handler handler = new Handler(){
         @Override
@@ -244,7 +249,6 @@ public class ExerciseFragment extends Fragment {
 //        linear_point = (LinearLayout) getView().findViewById(R.id.linear_point);
 
         // GridView
-        gridView = (GridView) getView().findViewById(R.id.gridview);
     }
 
 //    @Override
